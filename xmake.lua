@@ -12,7 +12,7 @@ task("format")
     set_category("plugin")
     set_menu {
         usage = "xmake format",
-        description = "Format code inside src directory using clang-format",
+        description = "Format code inside src/ directory using clang-format",
         options = {}
     }
 
