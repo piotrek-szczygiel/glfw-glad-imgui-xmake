@@ -2,11 +2,26 @@ add_rules("mode.debug", "mode.release")
 
 add_requires("fmt ^7.1.3", "glad ^0.1.34", "glfw ^3.3.4", "glm ^0.9.9", "spdlog ^1.8.5", "stb", "imgui-docking")
 
-target("test")
+target("app")
     set_kind("binary")
     set_languages("cxx17")
     add_files("src/*.cpp")
     add_packages("fmt", "glad", "glfw", "glm", "spdlog", "stb", "imgui-docking")
+
+task("format")
+    set_category("plugin")
+    set_menu {
+        usage = "xmake format",
+        description = "Format code inside src directory using clang-format",
+        options = {}
+    }
+
+    on_run(function()
+        for _, file in ipairs(table.join(os.files("$(projectdir)/src/**.cpp"), os.files("$(projectdir)/src/**.h"))) do
+            print("Formatting " .. path.relative(file))
+            os.execv("clang-format", {"-i", file})
+        end
+    end)
 
 package("imgui-docking")
     add_urls("https://github.com/ocornut/imgui/archive/ac35b4bba2c30ad3df88ce8b86aaa8877099fc96.tar.gz")

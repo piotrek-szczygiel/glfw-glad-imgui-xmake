@@ -83,9 +83,8 @@ int main(int, char**) {
     ImGui_ImplOpenGL3_Init(glsl_version);
 
     // Load Fonts
-    io.Fonts->AddFontFromFileTTF("Roboto-Medium.ttf", 16.0f);
+    io.Fonts->AddFontFromFileTTF("assets/Roboto-Medium.ttf", 16.0f);
 
-    bool show_window = false;
     auto clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     while (!glfwWindowShouldClose(window)) {
@@ -105,13 +104,14 @@ int main(int, char**) {
         ImGui::NewFrame();
 
         {
+            static char name[32] = "Peter";
+            static bool checkbox = false;
             static float f = 0.0f;
             static int counter = 0;
-            static char name[32] = "Peter";
 
             ImGui::Begin("Hello, world!");
 
-            ImGui::Checkbox("Another Window", &show_window);
+            ImGui::Checkbox("Checkbox", &checkbox);
 
             ImGui::InputText("Your name", name, IM_ARRAYSIZE(name));
             ImGui::Text("Hello, %s!", name);
