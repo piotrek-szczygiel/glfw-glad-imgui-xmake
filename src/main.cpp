@@ -87,12 +87,23 @@ int main(int, char**) {
 
     auto clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+    glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+            glfwSetWindowShouldClose(window, GLFW_TRUE);
+        } else if (key == GLFW_KEY_F11 && action == GLFW_PRESS) {
+            if (glfwGetWindowAttrib(window, GLFW_MAXIMIZED)) {
+                glfwRestoreWindow(window);
+            } else {
+                glfwMaximizeWindow(window);
+            }
+        }
+    });
+
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
         if (!io.WantCaptureKeyboard) {
             // Handle keyboard input
-            if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) glfwSetWindowShouldClose(window, GLFW_TRUE);
         }
 
         if (!io.WantCaptureMouse) {
