@@ -1,5 +1,6 @@
 .DS_Store
-.xmake/
-build/
+.cache
+.xmake
+build
 imgui.ini
 compile_commands.json
