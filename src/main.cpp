@@ -11,6 +11,8 @@
 #define SPDLOG_FMT_EXTERNAL
 #include <spdlog/spdlog.h>
 
+#include "game.h"
+
 int main(int, char**) {
     glfwSetErrorCallback([](int error, const char* description) { spdlog::error("GLFW error {}: {}", error, description); });
     if (!glfwInit()) return 1;
@@ -83,9 +85,10 @@ int main(int, char**) {
     ImGui_ImplOpenGL3_Init(glsl_version);
 
     // Load Fonts
-    io.Fonts->AddFontFromFileTTF("assets/Roboto-Medium.ttf", 16.0f);
+    io.Fonts->AddFontFromFileTTF("data/Roboto-Medium.ttf", 16.0f);
 
-    auto clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+    Game game;
+    glfwSetWindowUserPointer(window, &game);
 
     glfwSetKeyCallback(window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
         if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
@@ -96,56 +99,36 @@ int main(int, char**) {
             } else {
                 glfwMaximizeWindow(window);
             }
+        } else {
+            auto game = (Game*)glfwGetWindowUserPointer(window);
+            game->key_callback(key, scancode, action, mods, ImGui::GetIO().WantCaptureKeyboard);
+        }
+    });
+
+    glfwSetCursorPosCallback(window, [](GLFWwindow* window, double xpos, double ypos) {
+        if (!ImGui::GetIO().WantCaptureMouse) {
+            auto game = (Game*)glfwGetWindowUserPointer(window);
+            game->mouse_pos_callback(xpos, ypos);
         }
     });
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
 
-        if (!io.WantCaptureKeyboard) {
-            // Handle keyboard input
-        }
-
-        if (!io.WantCaptureMouse) {
-            // Handle mouse input
-        }
-
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        {
-            static char name[32] = "Peter";
-            static bool checkbox = false;
-            static float f = 0.0f;
-            static int counter = 0;
+        game.imgui_frame();
 
-            ImGui::Begin("Hello, world!");
-
-            ImGui::Checkbox("Checkbox", &checkbox);
-
-            ImGui::InputText("Your name", name, IM_ARRAYSIZE(name));
-            ImGui::Text("Hello, %s!", name);
-
-            ImGui::SliderFloat("float", &f, 0.0f, 1.0f);
-            ImGui::ColorEdit3("clear color", (float*)&clear_color);
-
-            if (ImGui::Button("Button")) counter++;
-            ImGui::SameLine();
-            ImGui::Text("counter = %d", counter);
-
-            ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-            ImGui::End();
-        }
-
+        ImGui::End();
         ImGui::Render();
 
         int display_w, display_h;
         glfwGetFramebufferSize(window, &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
 
-        glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);
-        glClear(GL_COLOR_BUFFER_BIT);
+        game.gl_frame();
 
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
